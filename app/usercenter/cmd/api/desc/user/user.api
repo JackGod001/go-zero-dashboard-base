@@ -1,0 +1,246 @@
+syntax = "v1"
+info(
+    title: "用户"
+    desc: ""
+    author: ""
+    email: ""
+    version: "v1"
+)
+//基础结构体
+type (
+    User {
+        Id int64 `json:"id"`
+        Account string `json:"account"`
+        Email string `json:"email"`
+        Password string `json:"password"`
+        Info string `json:"info"`
+    }
+)
+type (
+    //登陆时获取token的请求参数
+    GetTokenByCodeReq {
+        Code string `json:"code"  label:"code"`
+        State string `json:"state"  label:"state"`
+    }
+        //刷新token的请求参数
+    RefreshTokenReq {
+        //    必填
+        RefreshToken string `json:"refresh_token"  validate:"required"  label:"refresh_token"`
+    }
+        //登陆时获取token的响应参数,刷新token的响应参数 返回参数的json字段命名 是根据nextauth.js 中的配置文件来命名的
+    GetTokenByCodeResp {
+        AccessToken string `json:"access_token"`
+        TokenType string `json:"token_type,omitempty"`
+        // RefreshToken 是应用程序（而不是用户）使用的令牌，用于在访问令牌过期时刷新该令牌
+        RefreshToken string `json:"refresh_token,omitempty"`
+        // 如果为零，TokenSource 实现将永远重用相同的令牌，并且不会使用该 TokenSource 的 RefreshToken 或等效的机制。
+        ExpiresAt int64 `json:"expires_at,omitempty"`
+    }
+)
+
+
+
+
+type (
+    UserInfoResp {
+        Username string `json:"username"`
+        Avatar string `json:"avatar"`
+    }
+)
+
+
+
+type (
+    UserProfileInfoResp {
+        Id string `json:"id"`
+        //		Username string `json:"username"`
+        Nickname string `json:"nickname"`
+        //		Gender   int64  `json:"gender"`
+        //		Email    string `json:"email"`
+        //		Mobile   string `json:"mobile"`
+        //		Remark   string `json:"remark"`
+        Avatar string `json:"avatar"`
+    }
+)
+
+type (
+    UpdatePasswordReq {
+        OldPassword string `json:"oldPassword"  validate:"required,min=6,max=12"  label:"旧密码"`
+        NewPassword string `json:"newPassword"  validate:"required,min=6,max=12"  label:"新密码"`
+    }
+)
+////  =============== casdoor单点登陆 ===============
+//@server(
+//    prefix: usercenter/v1
+//    group: userCasdoor
+//    // todo postman 接口调试时 debug 方便查错
+//    timeout: 3000s
+//)
+//service go_zero_dashboard_base {
+//    // 注册在casdoor服务中这里只有登录
+//    @doc (
+//        summary: "根据casdoor的code,state换取jwt token"
+//    )
+//    @handler loginByCasdoor
+//    post /login (GetTokenByCodeReq) returns (GetTokenByCodeResp)
+//}
+//
+//
+//@server(
+//    prefix: usercenter/v1
+//    group: userCasdoor
+//    // todo postman 接口调试时 debug 方便查错
+//    timeout: 3000s
+//    // 重点是前面的这个jwt，这个是用来做鉴权的，如果不需要鉴权，可以不写,后面是自定义的名字
+//    //    这里中间件jwt验证放到 serviceContext.go 初始化中了,应为要加载casdoor的相关配置, 实际处理代码在 authMiddleware.go
+//    middleware: CustomJwtHandle
+//)
+//service go_zero_dashboard_base {
+//    @doc(
+//        summary: "用户资料"
+//    )
+//    // 小驼峰命名
+//    @handler getUserInfo
+//    get /info returns (UserInfoResp)
+//
+//    @doc(
+//        summary: "登录信息"
+//    )
+//    @handler getUserProfileInfo
+//    get /profile/info returns (UserProfileInfoResp)
+//
+//    @doc(
+//        summary: "刷新token"
+//    )
+//    @handler refreshToken
+//    post /token/refresh (RefreshTokenReq) returns (GetTokenByCodeResp)
+//
+//    @doc(
+//        summary: "更新密码"
+//    )
+//
+//    @handler updateUserPassword
+//    post /password/update (UpdatePasswordReq)
+//    @doc(
+//        summary: "退出"
+//    )
+//    @handler Logout
+//    post /logout
+//}
+////  =============== casdoor单点登陆 ===============
+
+
+
+
+
+
+
+
+
+//  =============== 常规登陆方式 jwt中间件待完成===============
+
+type (
+    LoginReq {
+        Email string `json:"email"     validate:"required,email"         label:"邮箱"`
+        Password string `json:"password"  validate:"required,min=6,max=12"  label:"密码"`
+        //	验证
+        CaptchaId string `json:"captchaId"   validate:"required" label:"验证码id"`
+        VerifyCode string `json:"verifyCode"  validate:"required" label:"验证码"`
+    }
+
+    LoginResp {
+        AccessToken string `json:"accessToken"`
+        AccessExpire int64 `json:"accessExpire"`
+        RefreshAfter int64 `json:"refreshAfter"`
+    }
+)
+
+type (
+    LoginCaptchaResp {
+        CaptchaId string `json:"captchaId"`
+        VerifyCode string `json:"verifyCode"`
+    }
+)
+
+type (
+    RegisterReq {
+        Email string `json:"email"     validate:"required,email,max=50"         label:"邮箱"`
+        Password string `json:"newPassword"  validate:"required,min=6,max=12"  label:"密码"`
+    }
+    RegisterResp  {
+        AccessToken string `json:"accessToken"`
+        AccessExpire int64 `json:"accessExpire"`
+        RefreshAfter int64 `json:"refreshAfter"`
+    }
+)
+
+
+@server(
+    prefix: usercenter/v1
+    group: user
+    // todo postman 接口调试时 debug 方便查错
+    timeout: 3000s
+    // 这里重点  对应 app/usercenter/cmd/api/etc 目录下配置文件中的 JwtAuth配置
+    jwt:JwtAuth
+)
+service go_zero_dashboard_base {
+    @doc "register"
+    // 小驼峰命名
+    @handler register
+    post /user/register (RegisterReq) returns (RegisterResp)
+
+    @doc "login"
+    @handler login
+    post /login (LoginReq) returns (LoginResp)
+
+    @doc(
+        summary: "登录验证码"
+    )
+    @handler GetLoginCaptcha
+    get /login/captcha returns (LoginCaptchaResp)
+}
+
+
+@server(
+    prefix: usercenter/v1
+    group: user
+    // todo postman 接口调试时 debug 方便查错
+    timeout: 3000s
+    // 重点是前面的这个jwt，这个是用来做鉴权的，如果不需要鉴权，可以不写,后面是自定义的名字
+    // 自定义处理jwt中间件
+    middleware: CommonJwtAuthMiddleware
+)
+
+service go_zero_dashboard_base {
+    @doc(
+        summary: "用户资料"
+    )
+    // 小驼峰命名
+    @handler getUserInfo
+    get /info returns (UserInfoResp)
+
+    @doc(
+        summary: "登录信息"
+    )
+    @handler getUserProfileInfo
+    get /profile/info returns (UserProfileInfoResp)
+
+    @doc(
+        summary: "刷新token"
+    )
+    @handler refreshToken
+    post /token/refresh (RefreshTokenReq) returns (GetTokenByCodeResp)
+
+    @doc(
+        summary: "更新密码"
+    )
+
+    @handler updateUserPassword
+    post /password/update (UpdatePasswordReq)
+    @doc(
+        summary: "退出"
+    )
+    @handler Logout
+    post /logout
+}
+    //  =============== 常规登陆方式 ===============

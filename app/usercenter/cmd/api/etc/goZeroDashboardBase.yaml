@@ -1,37 +1,31 @@
-Name: learn_to_use_user
+Name: go_zero_dashboard_base
 Host: 0.0.0.0
 Port: 1004
 Mode: dev
 
 
-#用于加密密码时使用的盐值
+#用于常规登录加密密码时使用的盐值
 Salt: Kdi8mTfc5sTXO7OG
 
-# jwt 登陆 常规登陆,由本体服务验证用户登录,退出等
-#JwtAuth:
-#  #  这里是jwt的密钥，可以随意修改
-#  AccessSecret: kRZ3kA7Lur4LqOWi
-#  AccessExpire: 86400
 
-## learn_to_use_user
-## learn_to_use_user
-## BGjfAJKxWbZ4X7RP
+
 Mysql:
-  DataSource: learn_to_use_user:BGjfAJKxWbZ4X7RP@tcp(mysql:3306)/learn_to_use_user?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  DataSource: go_zero_dashboard_base:BGjfAJKxWbZ4X7RP@tcp(mysql:3306)/go_zero_dashboard_base?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
 
 # redis密码修改后记得与docker-compose.yml中的redis密码同步
+#go-zero内部数据库自动缓存管理数据库主键,唯一索引,放到redis中
 Cache:
   - Host: redis:6379
     Pass: "G62m50oigInCsf"
     Type: node
-
+# 自定义redis,用于存储用户登录信息,等其他业务使用
 Redis:
   Host: redis:6379
   Pass: "G62m50oigInCsf"
   Type: node
 
 
-# Casdoor 单点登陆, 由casdoor服务验证用户登录,退出等
+# Casdoor 单点登陆, 由casdoor服务验证用户登录,退出等, 如果想使用常规登录,注释这一段,开启下面 JwtAuth
 CasdoorConfig:
   Endpoint: https://cas.hyue.com
   ClientId: 59b3020f1a744534c35b
@@ -41,3 +35,8 @@ CasdoorConfig:
   # 客户端证书 需要在casdoor 中下载 https://cas.hyue.com/certs 读取文件 这里随便写一个值
   Certificate: xxxxx
 
+# jwt 登陆 常规登陆,由本体服务验证用户登录,退出等. 默认采用上面 CasdoorConfig ,这个可以注释
+JwtAuth:
+  #  #  这里是jwt的密钥，可以随意修改
+  AccessSecret: ae0536f9-6450-4606-8e13-5a19ed505da0
+  AccessExpire: 86400

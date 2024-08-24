@@ -1,0 +1,4 @@
+#用来在docker-compose.yml文件中区分不同容器名前缀,防止本地多个相同容器名
+APP_NAME=go_zero_dashboard_base
+#占用本机的redis端口号
+REDIS_EXPOSE_PORT=6377

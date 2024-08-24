@@ -20,9 +20,6 @@ services:
   #前端api + 业务rpc - Front-end API + business RPC
   #  deploy/nginx/conf.d/nginx_app.conf 的配置注意对应上
   api:
-    # docker-hub : https://hub.docker.com/r/lyumikael/gomodd  intel IMAGE
-    # dockerfile: https://github.com/Mikaelemmmm/gomodd , MACOS M1\M2  IMAGE
-    #    image: lyumikael/gomodd:v1.20.3
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -73,7 +70,7 @@ services:
     environment:
       - SSH_REMOTE_USER=root
       #      - 远程服务器IP - Remote server IP `
-      - SSH_REMOTE_HOST=39.97.182.45
+      - SSH_REMOTE_HOST=
       #      - 远程建立隧道端口
       - SSH_REMOTE_PORT=22
       #     SSH_BIND_IP指定的实际上是要将服务器A的端口服务映射到服务器B的哪个网络接口上，一般就是0.0.0.0即全部接口
@@ -131,7 +128,7 @@ services:
     container_name: ${APP_NAME}_pikadb
     ports:
       # 6379注意配置文件中要一致
-      - "${Redis_Expose_Port}:6379"
+      - "${REDIS_EXPOSE_PORT}:6379"
     volumes:
       - ./data/pika:/pika/log
       # 指定配置文件路径,如果有需要指定配置文件则在这里指定 注意: pika.conf 要在./deploy/pika目录中

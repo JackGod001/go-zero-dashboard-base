@@ -17,9 +17,9 @@ data/*
 .vscode
 .vscode/
 .env
+docker-compose.yml
 
 
 logs
 # dlv debug.log
 debug.log
-docker-compose_template.yml

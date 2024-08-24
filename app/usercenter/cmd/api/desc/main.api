@@ -1,0 +1,17 @@
+syntax = "v1"
+
+info (
+	title:   "go_zero_dashboard_base"
+	desc:    "go_zero_dashboard_base"
+	author:  ""
+	email:   ""
+	version: "v1.0.0"
+)
+
+import (
+	// 全局共用结构体
+	"page/page.api"
+	// 用户api
+	"user/user.api"
+)
+
