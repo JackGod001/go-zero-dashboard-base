@@ -1,0 +1,43 @@
+Name: learn_to_use_user
+Host: 0.0.0.0
+Port: 1004
+Mode: dev
+
+
+#用于加密密码时使用的盐值
+Salt: Kdi8mTfc5sTXO7OG
+
+# jwt 登陆 常规登陆,由本体服务验证用户登录,退出等
+#JwtAuth:
+#  #  这里是jwt的密钥，可以随意修改
+#  AccessSecret: kRZ3kA7Lur4LqOWi
+#  AccessExpire: 86400
+
+## learn_to_use_user
+## learn_to_use_user
+## BGjfAJKxWbZ4X7RP
+Mysql:
+  DataSource: learn_to_use_user:BGjfAJKxWbZ4X7RP@tcp(mysql:3306)/learn_to_use_user?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+
+# redis密码修改后记得与docker-compose.yml中的redis密码同步
+Cache:
+  - Host: redis:6379
+    Pass: "G62m50oigInCsf"
+    Type: node
+
+Redis:
+  Host: redis:6379
+  Pass: "G62m50oigInCsf"
+  Type: node
+
+
+# Casdoor 单点登陆, 由casdoor服务验证用户登录,退出等
+CasdoorConfig:
+  Endpoint: https://cas.hyue.com
+  ClientId: 59b3020f1a744534c35b
+  ClientSecret: 4b3f8ec90acd85188b6912944e847ec5f270edf4
+  OrganizationName: built-in
+  ApplicationName: next_base_auth
+  # 客户端证书 需要在casdoor 中下载 https://cas.hyue.com/certs 读取文件 这里随便写一个值
+  Certificate: xxxxx
+

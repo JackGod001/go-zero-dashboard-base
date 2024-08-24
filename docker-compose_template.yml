@@ -1,0 +1,157 @@
+version: '3.4'
+
+services:
+  gateway:
+    image: nginx:1.21.5
+    container_name: ${APP_NAME}_nginx-gateway
+    restart: always
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8887:8081
+    volumes:
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d
+      - ./data/nginx/log:/var/log/nginx
+    networks:
+      - go_zero_dashboard_base
+    depends_on:
+      - api
+  #前端api + 业务rpc - Front-end API + business RPC
+  #  deploy/nginx/conf.d/nginx_app.conf 的配置注意对应上
+  api:
+    # docker-hub : https://hub.docker.com/r/lyumikael/gomodd  intel IMAGE
+    # dockerfile: https://github.com/Mikaelemmmm/gomodd , MACOS M1\M2  IMAGE
+    #    image: lyumikael/gomodd:v1.20.3
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: ${APP_NAME}_api
+    environment:
+      # 时区上海 - Timezone Shanghai
+      TZ: Asia/Shanghai
+      GOPROXY: https://goproxy.cn,direct
+      DEBUG_SERVICE_PATH: /go/go_zero_dashboard_base/data/server
+    working_dir: /go/go_zero_dashboard_base
+    volumes:
+      - .:/go/go_zero_dashboard_base
+    privileged: true
+    restart: always
+    networks:
+      - go_zero_dashboard_base
+    ports:
+      #      主机端口:容器端口 暴露端口方便调试 docker file 就不用配置了
+      - "2445:2445"
+    security_opt:
+      - "seccomp:unconfined" # 如果需要的话，关闭容器的安全选项，以便 Delve 可以正常运行
+    cap_add:
+      - SYS_PTRACE # 允许 Delve 进行调试跟踪
+    #    这里配置的是容器启动后执行的命令，这里是启动modd,modd会监听go文件的变化，自动编译，自动重启,这里的modd配置文件是modd.conf
+    #    和Dockerfile CMD的区别是，这里的命令是在容器启动后执行的，而Dockerfile CMD是在容器启动前执行的
+    #command: /bin/sh -c "air"
+    command: /bin/sh -c "modd"
+
+  #  mysql:
+#    image: mysql:5.7
+#    container_name: mysql
+#    environment:
+#      TZ: Asia/Shanghai
+#      MYSQL_ROOT_PASSWORD: go_zero_dashboard_base
+#      MYSQL_DATABASE: BGjfAJKxWbZ4X7RP
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - ./data/mysql/data:/var/lib/mysql
+#      - ./build/deploy/sql/:/docker-entrypoint-initdb.d/
+#    privileged: true
+#    restart: always
+  #这里使用隧道链接远程服务器的数据库
+  mysql:
+    # 这是个专门的隧道容器，用于将远程服务器的数据库映射到本地，方便开发调试
+    image: jnovack/autossh
+    container_name: ${APP_NAME}_autossh_mysql
+    environment:
+      - SSH_REMOTE_USER=root
+      #      - 远程服务器IP - Remote server IP `
+      - SSH_REMOTE_HOST=39.97.182.45
+      #      - 远程建立隧道端口
+      - SSH_REMOTE_PORT=22
+      #     SSH_BIND_IP指定的实际上是要将服务器A的端口服务映射到服务器B的哪个网络接口上，一般就是0.0.0.0即全部接口
+      - SSH_BIND_IP=0.0.0.0
+      #     远程隧道端口
+      #     指定将作为隧道入口的远程端点上的端口号。（默认值：random > 32768）如果您不希望每次重新启动jnovack/autossh时都需要一个新端口，您可能希望显式设置它。
+      - SSH_TUNNEL_PORT=3306
+      - SSH_TARGET_HOST=127.0.0.1
+      #     - 映射容器内的端口
+      - SSH_TARGET_PORT=3306
+      #      - 定义如何设置隧道：
+      #        -R是默认的，远程转发模式。
+      #        -L表示本地转发模式。
+      - SSH_MODE=-L
+    #这是给当前容器网络的端口，为的是让其他容器可以访问该容器的3306端口
+    expose:
+      - 3306
+    #开放给本地宿主机电脑的端口33069，为的是让本地电脑可以访问该容器的3306端口
+    #    ports:
+    #      - 33069:3306
+    volumes:
+      #      本地电脑的私钥 - Local computer's private key
+      - /Users/baishaojie/.ssh/ali.pem:/id_rsa
+    privileged: true
+    restart: always
+    networks:
+      - go_zero_dashboard_base
+#
+#  phpmyadmin:
+#    image: phpmyadmin:latest
+#    container_name: phpmyadmin
+#    restart: always
+#    ports:
+#      - "8080:80"
+#    environment:
+#      - PMA_ARBITRARY=1
+
+#  redis:
+#    image: redis:6.2.5
+#    container_name: ${APP_NAME}_redis
+#    ports:
+#      - "46379:6379"
+#    environment:
+#      TZ: Asia/Shanghai
+#    volumes:
+#      - ./data/redis/data:/data:rw
+#    # redis密码查看 app/usercenter/cmd/api/etc 配置文件
+#    command: "redis-server --requirepass G62m50oigInCsf  --appendonly yes"
+#    privileged: true
+#    restart: always
+#    networks:
+#      - go_zero_dashboard_base
+  redis:
+    image: pikadb/pika
+    container_name: ${APP_NAME}_pikadb
+    ports:
+      # 6379注意配置文件中要一致
+      - "${Redis_Expose_Port}:6379"
+    volumes:
+      - ./data/pika:/pika/log
+      # 指定配置文件路径,如果有需要指定配置文件则在这里指定 注意: pika.conf 要在./deploy/pika目录中
+      - ./deploy/pika:/pika/conf
+      - ./data/pika/db:/pika/db
+      - ./data/pika/dump:/pika/dump
+      - ./data/pika/dbsync:/pika/dbsync
+    environment:
+      TZ: Asia/Shanghai
+    privileged: true
+    # 配置文件中已有 daemonize : yes 与这里冲突
+#    restart: always
+#    command: "cat /pika/conf/pika.conf"
+    networks:
+      - go_zero_dashboard_base
+
+networks:
+  go_zero_dashboard_base:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.0.0/16
+
