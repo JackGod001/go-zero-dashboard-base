@@ -20,7 +20,7 @@ type Config struct {
 	//Casdoor 单点登陆, 由casdoor服务验证用户登录,退出等
 	CasdoorConfig casdoorsdk.AuthConfig
 	// jwt 登陆 常规登陆,由本体服务验证用户登录,退出等
-	JwtAuth struct {
+	Auth struct {
 		AccessSecret string
 		AccessExpire int64
 	}

@@ -2,3 +2,30 @@
 APP_NAME=go_zero_dashboard_base
 #占用本机的redis端口号
 REDIS_EXPOSE_PORT=6377
+
+# ============= API/RPC ===============
+USER_CENTER_API_EXPORT_PORT=8080
+# ============= API/RPC ===============
+
+#远程数据库服务器地址
+SSH_REMOTE_HOST=127.0.0.1
+SSH_REMOTE_USER=root
+# ssh 端口
+SSH_REMOTE_PORT=22
+
+# ============= 数据库 ===============
+
+#数据库ip
+DB_HOST=127.0.0.1
+#数据库端口号
+DB_PORT=3306
+#数据库名称
+DB_NAME=go_zero_dashboard
+#数据库用户名
+DB_USER=gozerodas
+#数据库密码
+DB_PASS=123456FDSE#
+
+REDIS_PASS=G62m50oigInCsf
+# ============= 数据库 ===============
+

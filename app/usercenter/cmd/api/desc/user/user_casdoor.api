@@ -69,86 +69,32 @@ type (
         NewPassword string `json:"newPassword"  validate:"required,min=6,max=12"  label:"新密码"`
     }
 )
-
-
-
-
-
-//  =============== 常规登陆方式 jwt中间件待完成===============
-
-type (
-    LoginReq {
-        Email string `json:"email"     validate:"required,email"         label:"邮箱"`
-        Password string `json:"password"  validate:"required,min=6,max=12"  label:"密码"`
-        //	验证
-        CaptchaId string `json:"captchaId"   validate:"required" label:"验证码id"`
-        VerifyCode string `json:"verifyCode"  validate:"required" label:"验证码"`
-    }
-
-    LoginResp {
-        AccessToken string `json:"accessToken"`
-        AccessExpire int64 `json:"accessExpire"`
-        RefreshAfter int64 `json:"refreshAfter"`
-    }
-)
-
-type (
-    LoginCaptchaResp {
-        CaptchaId string `json:"captchaId"`
-        VerifyCode string `json:"verifyCode"`
-    }
-)
-
-type (
-    RegisterReq {
-        Email string `json:"email"     validate:"required,email,max=50"         label:"邮箱"`
-        Password string `json:"newPassword"  validate:"required,min=6,max=12"  label:"密码"`
-    }
-    RegisterResp  {
-        AccessToken string `json:"accessToken"`
-        AccessExpire int64 `json:"accessExpire"`
-        RefreshAfter int64 `json:"refreshAfter"`
-    }
-)
-
-
+//  =============== casdoor单点登陆 ===============
 @server(
     prefix: usercenter/v1
-    group: user
+    group: userCasdoor
     // todo postman 接口调试时 debug 方便查错
     timeout: 3000s
-
 )
 service go_zero_dashboard_base {
-    @doc "register"
-    // 小驼峰命名
-    @handler register
-    post /user/register (RegisterReq) returns (RegisterResp)
-
-    @doc "login"
-    @handler login
-    post /login (LoginReq) returns (LoginResp)
-
-    @doc(
-        summary: "登录验证码"
+    // 注册在casdoor服务中这里只有登录
+    @doc (
+        summary: "根据casdoor的code,state换取jwt token"
     )
-    @handler GetLoginCaptcha
-    get /login/captcha returns (LoginCaptchaResp)
+    @handler loginByCasdoor
+    post /login (GetTokenByCodeReq) returns (GetTokenByCodeResp)
 }
 
 
 @server(
     prefix: usercenter/v1
-    group: user
+    group: userCasdoor
     // todo postman 接口调试时 debug 方便查错
     timeout: 3000s
-    // 自定义处理jwt中间件
-//    middleware: AuthMiddleware
-
-    // 这里重点  对应 app/usercenter/cmd/api/etc 目录下配置文件中的 Auth配置
-    jwt:Auth
+    // 重点是前面的这个jwt，这个是用来做鉴权的，如果不需要鉴权，可以不写,后面是自定义的名字
+    //    这里中间件jwt验证放到 serviceContext.go 初始化中了,应为要加载casdoor的相关配置, 实际处理代码在 authMiddleware.go
+    middleware: CasdoorJwtMiddleware
 )
-
 service go_zero_dashboard_base {
     @doc(
         summary: "用户资料"
@@ -181,4 +127,10 @@ service go_zero_dashboard_base {
     @handler Logout
     post /logout
 }
-    //  =============== 常规登陆方式 ===============
+//  =============== casdoor单点登陆 ===============
+
+
+
+
+
+

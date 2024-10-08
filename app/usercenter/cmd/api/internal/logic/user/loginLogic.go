@@ -20,11 +20,6 @@ type LoginLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
-type GenerateTokenResp struct {
-	AccessToken  string
-	AccessExpire int64
-	RefreshAfter int64
-}
 
 func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic {
 	return &LoginLogic{

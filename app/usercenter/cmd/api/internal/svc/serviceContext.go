@@ -17,11 +17,11 @@ import (
 //  =============== casdoor单点登陆 ===============
 
 type ServiceContext struct {
-	Config          config.Config
-	Redis           *redis.Client
-	UserModel       model.UserModel
-	CasdoorClient   *casdoorsdk.Client
-	CustomJwtHandle rest.Middleware
+	Config               config.Config
+	Redis                *redis.Client
+	UserModel            model.UserModel
+	CasdoorClient        *casdoorsdk.Client
+	CasdoorJwtMiddleware rest.Middleware
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -46,17 +46,17 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Password: c.Redis.Pass,
 		DB:       0,
 	})
-	jwtHandle, err := middleware.NewJwtHandler(casdoorClient, c)
+	CasdoorJwtMiddleware, err := middleware.NewCasdoorJwtMiddleware(casdoorClient)
 	if err != nil {
 		fmt.Println("无法初始化 jwtHandle:", err)
 		return nil
 	}
 	return &ServiceContext{
-		Config:          c,
-		Redis:           redisClient,
-		UserModel:       model.NewUserModel(mysqlConn, c.Cache),
-		CasdoorClient:   casdoorClient,
-		CustomJwtHandle: jwtHandle.Handle,
+		Config:               c,
+		Redis:                redisClient,
+		UserModel:            model.NewUserModel(mysqlConn, c.Cache),
+		CasdoorClient:        casdoorClient,
+		CasdoorJwtMiddleware: CasdoorJwtMiddleware.Handle,
 	}
 }
 func readTokenJWTKey(fileFullPath string) (string, error) {
@@ -82,26 +82,3 @@ func readTokenJWTKey(fileFullPath string) (string, error) {
 	}
 	return content, nil
 }
-
-//  =============== casdoor单点登陆 ===============
-
-////  =============== 常规登陆方式 ===============
-//type ServiceContext struct {
-//	Config          config.Config
-//	CustomJwtHandle rest.Middleware
-//	Redis           *redis.Client
-//}
-//
-//func NewServiceContext(c config.Config) *ServiceContext {
-//	redisClient := redis.NewClient(&redis.Options{
-//		Addr: c.Redis.Host,
-//		Password: c.Redis.Pass,
-//		DB:       0,
-//	})
-//	return &ServiceContext{
-//		Config:          c,
-//		CustomJwtHandle: middleware.NewCustomJwtHandleMiddleware().Handle,
-//		Redis:           redisClient,
-//	}
-//}
-////  =============== 常规登陆方式 ===============

@@ -3,10 +3,10 @@ package globalkey
 const (
 	SysPermMenuPrefix          = "/admin/"
 	SysJwtUserId               = "userId"
-	SysPermMenuCachePrefix     = "cache:arkAdmin:permMenu:"
-	SysOnlineUserCachePrefix   = "cache:arkAdmin:online:"
-	SysLoginCaptchaCachePrefix = "cache:arkAdmin:captcha:"
-	SysUserIdCachePrefix       = "cache:arkAdmin:sysUser:id:"
+	SysPermMenuCachePrefix     = "cache:sys:permMenu:"
+	SysOnlineUserCachePrefix   = "cache:sys:online:"
+	SysLoginCaptchaCachePrefix = "cache:sys:captcha:"
+	SysUserIdCachePrefix       = "cache:sys:sysUser:id:"
 	SysDateFormat              = "2006-01-02 15:04:05"
 	SysNewUserDefaultPassword  = "123456"
 	SysShowSystemError         = true

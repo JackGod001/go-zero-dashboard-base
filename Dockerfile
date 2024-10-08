@@ -1,4 +1,8 @@
-FROM golang:1.21.6-alpine
+FROM golang:1.21.6-alpine AS builder
+
+
+# 将 Alpine 的软件源更改为阿里云的镜像
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 # 设置环境变量
 ENV GOPROXY https://goproxy.cn,direct
@@ -10,10 +14,6 @@ RUN apk update --no-cache && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ >/etc/timezone
 
-# 安装 modd 和 Delve
+# 安装 modd(热加载) 和 Delve(调试)
 RUN go install github.com/cortesi/modd/cmd/modd@latest && \
     go install github.com/go-delve/delve/cmd/dlv@latest
-
-
-# 设置工作目录
-#WORKDIR /go

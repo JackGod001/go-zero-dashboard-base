@@ -35,36 +35,34 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CommonJwtAuthMiddleware},
-			[]rest.Route{
-				{
-					Method:  http.MethodGet,
-					Path:    "/info",
-					Handler: user.GetUserInfoHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/logout",
-					Handler: user.LogoutHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/password/update",
-					Handler: user.UpdateUserPasswordHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodGet,
-					Path:    "/profile/info",
-					Handler: user.GetUserProfileInfoHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/token/refresh",
-					Handler: user.RefreshTokenHandler(serverCtx),
-				},
-			}...,
-		),
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/info",
+				Handler: user.GetUserInfoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/logout",
+				Handler: user.LogoutHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/password/update",
+				Handler: user.UpdateUserPasswordHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/profile/info",
+				Handler: user.GetUserProfileInfoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/token/refresh",
+				Handler: user.RefreshTokenHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/usercenter/v1"),
 		rest.WithTimeout(3000000*time.Millisecond),
 	)

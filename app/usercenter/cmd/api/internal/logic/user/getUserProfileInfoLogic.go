@@ -4,6 +4,9 @@ import (
 	"context"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go_zero_dashboard_base/app/usercenter/cmd/api/internal/svc"
+	"go_zero_dashboard_base/app/usercenter/cmd/api/internal/types"
+	"go_zero_dashboard_base/common/errorx"
+	"go_zero_dashboard_base/common/utils"
 )
 
 type GetUserProfileInfoLogic struct {
@@ -20,19 +23,19 @@ func NewGetUserProfileInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-//常规登陆获取userid 是 int64
-//func (l *GetUserProfileInfoLogic) GetUserProfileInfo() (resp *types.UserProfileInfoResp, err error) {
-//	userId := utils.GetCasdoorUserId(l.ctx)
-//
-//	user, err := l.svcCtx.UserModel.FindOne(l.ctx, userId)
-//	if err != nil {
-//		return nil, errorx.NewSystemError(errorx.ServerErrorCode, err.Error())
-//	}
-//	// userId 转化为 string
-//	return &types.UserProfileInfoResp{
-//		Id:       strconv.FormatInt(userId, 10),
-//		Nickname: user.Nickname,
-//		//Email:    user.Email,
-//		Avatar: user.Avatar,
-//	}, nil
-//}
+// 常规登陆获取userid 是 int64
+func (l *GetUserProfileInfoLogic) GetUserProfileInfo() (resp *types.UserProfileInfoResp, err error) {
+	userId := utils.GetCasdoorUserId(l.ctx)
+	// todo casdoor
+	user, err := l.svcCtx.CasdoorClient.GetUserByUserId(userId)
+	if err != nil {
+		return nil, errorx.NewSystemError(errorx.ServerErrorCode, err.Error())
+	}
+	// userId 转化为 string
+	return &types.UserProfileInfoResp{
+		Id:       userId,
+		Nickname: user.Name,
+		//Email:    user.Email,
+		Avatar: user.Avatar,
+	}, nil
+}

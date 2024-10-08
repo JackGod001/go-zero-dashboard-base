@@ -15,8 +15,8 @@ import (
 
 type Config struct {
 	rest.RestConf
-	Salt    string
-	JwtAuth struct {
+	Salt string
+	Auth struct {
 		AccessSecret string
 		AccessExpire int64
 	}
