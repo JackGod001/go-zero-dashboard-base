@@ -29,3 +29,12 @@ DB_PASS=123456FDSE#
 REDIS_PASS=G62m50oigInCsf
 # ============= 数据库 ===============
 
+# ============= casdoor ===============
+CASDOOR_CONFIG_ENDPOINT=
+CASDOOR_CONFIG_CLIENT_ID=
+CASDOOR_CONFIG_CLIENT_SECRET=
+CASDOOR-CONFIG-ORGANIZATION-NAME=
+CASDOOR-CONFIG-APPLICATION-NAME=
+# ============= casdoor ===============
+
+

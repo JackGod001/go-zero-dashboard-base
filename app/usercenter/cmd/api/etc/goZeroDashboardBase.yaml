@@ -27,11 +27,11 @@ Redis:
 
 # Casdoor 单点登陆, 由casdoor服务验证用户登录,退出等, 如果想使用常规登录,注释这一段,开启下面 Auth
 CasdoorConfig:
-  Endpoint: https://cas.hyue.com
-  ClientId: 59b3020f1a744534c35b
-  ClientSecret: 4b3f8ec90acd85188b6912944e847ec5f270edf4
-  OrganizationName: built-in
-  ApplicationName: next_base_auth
+  Endpoint: ${CASDOOR_CONFIG_ENDPOINT}
+  ClientId: ${CASDOOR_CONFIG_CLIENT_ID}
+  ClientSecret: ${CASDOOR_CONFIG_CLIENT_SECRET}
+  OrganizationName: ${CASDOOR-CONFIG-ORGANIZATION-NAME}
+  ApplicationName: ${CASDOOR-CONFIG-APPLICATION-NAME}
   # 客户端证书 需要在casdoor 中下载 https://cas.hyue.com/certs 读取文件 这里随便写一个值
   #    | 代表保留换行符
   Certificate: |
